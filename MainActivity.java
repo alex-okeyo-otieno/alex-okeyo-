@@ -1,51 +1,42 @@
-package com.abc.sharedpreferences;
+package com.abc.sqlitedatabasefullexample;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
-   private SharedPrefenceConfig sharedPrefenceConfig;
-   private EditText username,userpassword;
-
+public class MainActivity extends AppCompatActivity implements HomeFragment.OpenDbOperation {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sharedPrefenceConfig=new SharedPrefenceConfig(getApplicationContext());
-        username=findViewById(R.id.username);
-        userpassword=findViewById(R.id.password);
-        if(sharedPrefenceConfig.ReadLoginStatus()){
+        if (findViewById(R.id.fragment_container)!=null){
 
-            startActivity(new Intent(this,SuccessActivity.class));
-            sharedPrefenceConfig.WriteLoginStatus(true);
-            finish();
+            if (savedInstanceState!=null){
+                return;
+            }
         }
+
+        HomeFragment homeFragment=new HomeFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,homeFragment,null).commit();
+
     }
 
-    public void UserLogin(View view) {
-
-        String Username=username.getText().toString();
-        String Password=userpassword.getText().toString();
-
-        if (Username.equals(getResources().getString(R.string.username))&& Password.equals(getResources().getString(R.string.userpassword))){
-
-            startActivity(new Intent(this,MainActivity.class));
-            sharedPrefenceConfig.WriteLoginStatus(true);
-            finish();
-
+    @Override
+    public void operationPerformed(int method) {
+        switch (method){
+            case 0:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new AddContactFragment()).addToBackStack(null).commit();
+                break;
+            case 1:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new ReadContacts()).addToBackStack(null).commit();
+                break;
+            case 2:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new UpdateFragment()).addToBackStack(null).commit();
+                break;
+            case 3:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new DeleteContactFragment()).addToBackStack(null).commit();
+                break;
         }
-        else{
-            Toast.makeText(this,"Login Failed....Try Again Later...",Toast.LENGTH_SHORT).show();
-
-            username.setText("");
-            userpassword.setText("");
-        }
-
     }
 }
